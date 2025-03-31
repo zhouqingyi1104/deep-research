@@ -97,6 +97,8 @@
     "math": "Math"
   },
   "setting": {
+    "provider": "AI Provider",
+    "kimiApiKeyPlaceholder": "Please enter your API Key from Moonshot AI platform",
     "title": "Setting",
     "description": "All settings are saved in the user's browser.",
     "local": "Local",

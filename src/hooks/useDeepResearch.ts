@@ -53,10 +53,14 @@ function useDeepResearch() {
   const [status, setStatus] = useState<string>("");
 
   async function askQuestions() {
-    const { thinkingModel, language } = useSettingStore.getState();
+    const { thinkingModel, language, provider: providerName } = useSettingStore.getState();
     const { question } = useTaskStore.getState();
     setStatus(t("research.common.thinking"));
-    const provider = createProvider("google");
+
+
+    const provider = createProvider(providerName);
+
+    
     const result = streamText({
       model: provider(thinkingModel),
       system: getSystemPrompt(),
@@ -76,7 +80,7 @@ function useDeepResearch() {
   }
 
   async function runSearchTask(queries: SearchTask[]) {
-    const { networkingModel, language } = useSettingStore.getState();
+    const { networkingModel, language, provider: providerName } = useSettingStore.getState();
     setStatus(t("research.common.research"));
     const plimit = Plimit(1);
     for await (const item of queries) {
@@ -84,7 +88,7 @@ function useDeepResearch() {
         let content = "";
         const sources: Source[] = [];
         taskStore.updateTask(item.query, { state: "processing" });
-        const provider = createProvider("google");
+        const provider = createProvider(providerName);
         const searchResult = streamText({
           model: provider(
             networkingModel,
@@ -117,11 +121,11 @@ function useDeepResearch() {
   }
 
   async function reviewSearchResult() {
-    const { thinkingModel, language } = useSettingStore.getState();
+    const { thinkingModel, language, provider: providerName } = useSettingStore.getState();
     const { query, tasks, suggestion } = useTaskStore.getState();
     setStatus(t("research.common.research"));
     const learnings = tasks.map((item) => item.learning);
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       system: getSystemPrompt(),
@@ -161,13 +165,13 @@ function useDeepResearch() {
   }
 
   async function writeFinalReport() {
-    const { thinkingModel, language } = useSettingStore.getState();
+    const { thinkingModel, language, provider: providerName } = useSettingStore.getState();
     const { query, tasks, setId, setTitle, setSources } =
       useTaskStore.getState();
     const { save } = useHistoryStore.getState();
     setStatus(t("research.common.writing"));
     const learnings = tasks.map((item) => item.learning);
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       system: [getSystemPrompt(), getOutputGuidelinesPrompt()].join("\n\n"),
@@ -199,12 +203,12 @@ function useDeepResearch() {
   }
 
   async function deepResearch() {
-    const { thinkingModel, language } = useSettingStore.getState();
+    const { thinkingModel, language, provider: providerName } = useSettingStore.getState();
     const { query } = useTaskStore.getState();
     setStatus(t("research.common.thinking"));
     try {
       let queries = [];
-      const provider = createProvider("google");
+      const provider = createProvider(providerName);
       const result = streamText({
         model: provider(thinkingModel),
         system: getSystemPrompt(),

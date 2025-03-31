@@ -97,6 +97,8 @@
     "math": "数学公式"
   },
   "setting": {
+    "provider": "AI 提供商",
+    "kimiApiKeyPlaceholder": "请输入您从 Moonshot AI 开放平台申请的 API Key",
     "title": "设置",
     "description": "所有设置都将保存在您的浏览器中。",
     "local": "本地",

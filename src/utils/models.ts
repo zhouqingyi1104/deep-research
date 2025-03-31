@@ -1,15 +1,47 @@
 export function isThinkingModel(model: string) {
-  return model.includes("thinking") || model.startsWith("gemini-2.5-pro");
+  // Google models
+  if (model.startsWith("gemini")) {
+    return model.includes("thinking") || model.startsWith("gemini-2.5-pro");
+  }
+  // OpenAI models - consider GPT-4 models as thinking models
+  else if (model.startsWith("gpt-4")) {
+    return true;
+  }
+  // Anthropic models - consider Claude Opus and Sonnet as thinking models
+  else if (model.includes("claude")) {
+    return model.includes("opus") || model.includes("sonnet");
+  }
+  // Moonshot Kimi models - all models can be used for thinking
+  else if (model.startsWith("moonshot")) {
+    return true;
+  }
+  return false;
 }
 
 export function isNetworkingModel(model: string) {
-  return (
-    (model.startsWith("gemini-2.0-flash") &&
-      !model.includes("lite") &&
-      !model.includes("thinking") &&
-      !model.includes("image")) ||
-    model.startsWith("gemini-2.5-pro")
-  );
+  // Google models
+  if (model.startsWith("gemini")) {
+    return (
+      (model.startsWith("gemini-2.0-flash") &&
+        !model.includes("lite") &&
+        !model.includes("thinking") &&
+        !model.includes("image")) ||
+      model.startsWith("gemini-2.5-pro")
+    );
+  }
+  // All OpenAI models can be used for networking
+  else if (model.startsWith("gpt")) {
+    return true;
+  }
+  // All Claude models can be used for networking
+  else if (model.includes("claude")) {
+    return true;
+  }
+  // All Moonshot Kimi models can be used for networking
+  else if (model.startsWith("moonshot")) {
+    return true;
+  }
+  return false;
 }
 
 export function filterThinkingModelList(modelList: string[]) {

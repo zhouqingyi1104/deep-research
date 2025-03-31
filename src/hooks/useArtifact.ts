@@ -28,9 +28,9 @@ function useArtifact({ value, onChange }: ArtifactProps) {
   const [loadingAction, setLoadingAction] = useState<string>("");
 
   async function AIWrite(prompt: string, systemInstruction?: string) {
-    const { thinkingModel } = useSettingStore.getState();
+    const { thinkingModel, provider: providerName } = useSettingStore.getState();
     setLoadingAction("aiWrite");
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       prompt: AIWritePrompt(value, prompt, systemInstruction),
@@ -47,9 +47,9 @@ function useArtifact({ value, onChange }: ArtifactProps) {
   }
 
   async function translate(lang: string, systemInstruction?: string) {
-    const { thinkingModel } = useSettingStore.getState();
+    const { thinkingModel, provider: providerName } = useSettingStore.getState();
     setLoadingAction("translate");
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       prompt: changeLanguagePrompt(value, lang, systemInstruction),
@@ -66,9 +66,9 @@ function useArtifact({ value, onChange }: ArtifactProps) {
   }
 
   async function changeReadingLevel(level: string, systemInstruction?: string) {
-    const { thinkingModel } = useSettingStore.getState();
+    const { thinkingModel, provider: providerName } = useSettingStore.getState();
     setLoadingAction("readingLevel");
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       prompt: changeReadingLevelPrompt(value, level, systemInstruction),
@@ -85,9 +85,9 @@ function useArtifact({ value, onChange }: ArtifactProps) {
   }
 
   async function adjustLength(length: string, systemInstruction?: string) {
-    const { thinkingModel } = useSettingStore.getState();
+    const { thinkingModel, provider: providerName } = useSettingStore.getState();
     setLoadingAction("adjustLength");
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       prompt: adjustLengthPrompt(value, length, systemInstruction),
@@ -104,9 +104,9 @@ function useArtifact({ value, onChange }: ArtifactProps) {
   }
 
   async function continuation(systemInstruction?: string) {
-    const { thinkingModel } = useSettingStore.getState();
+    const { thinkingModel, provider: providerName } = useSettingStore.getState();
     setLoadingAction("continuation");
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       prompt: continuationPrompt(value, systemInstruction),
@@ -123,9 +123,9 @@ function useArtifact({ value, onChange }: ArtifactProps) {
   }
 
   async function addEmojis(systemInstruction?: string) {
-    const { thinkingModel } = useSettingStore.getState();
+    const { thinkingModel, provider: providerName } = useSettingStore.getState();
     setLoadingAction("addEmojis");
-    const provider = createProvider("google");
+    const provider = createProvider(providerName);
     const result = streamText({
       model: provider(thinkingModel),
       prompt: addEmojisPrompt(value, systemInstruction),

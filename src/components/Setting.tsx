@@ -1,5 +1,5 @@
 "use client";
-import { useLayoutEffect, useState, useCallback, useMemo } from "react";
+import { useLayoutEffect, useState, useCallback, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshCw } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,6 +52,7 @@ const formSchema = z.object({
   apiKey: z.string().optional(),
   apiProxy: z.string().optional(),
   accessPassword: z.string().optional(),
+  provider: z.enum(["google", "openai", "anthropic", "kimi"]),
   thinkingModel: z.string(),
   networkingModel: z.string(),
   language: z.string().optional(),
@@ -83,10 +84,50 @@ function Setting({ open, onClose }: SettingProps) {
     defaultValues: async () => {
       return new Promise((resolve) => {
         const state = useSettingStore.getState();
-        resolve({ ...omit(state, ["update"]) });
+        resolve({
+          ...omit(state, ["update"]) as {
+            provider: "google" | "openai" | "anthropic" | "kimi";
+            thinkingModel: string;
+            networkingModel: string;
+            apiKey?: string;
+            apiProxy?: string;
+            accessPassword?: string;
+            language?: string;
+            theme?: string;
+          }
+        });
       });
     },
   });
+  
+  // 监听provider变化，更新思维模型和联网模型
+  useEffect(() => {
+    const currentProvider = form.getValues("provider");
+    const defaultModels = {
+      google: {
+        thinking: "gemini-2.0-flash-thinking-exp",
+        networking: "gemini-2.0-flash-exp"
+      },
+      openai: {
+        thinking: "gpt-4o",
+        networking: "gpt-3.5-turbo"
+      },
+      anthropic: {
+        thinking: "claude-3-opus",
+        networking: "claude-3-haiku"
+      },
+      kimi: {
+        thinking: "moonshot-v1-8k",
+        networking: "moonshot-v1-32k"
+      }
+    };
+    
+    // 当provider变化时，重置思维模型和联网模型为该提供商的默认模型
+    if (currentProvider && defaultModels[currentProvider]) {
+      form.setValue("thinkingModel", defaultModels[currentProvider].thinking);
+      form.setValue("networkingModel", defaultModels[currentProvider].networking);
+    }
+  }, [form.watch("provider")]);
 
   function handleClose(open: boolean) {
     if (!open) onClose();
@@ -209,6 +250,43 @@ function Setting({ open, onClose }: SettingProps) {
               </TabsContent>
             </Tabs>
 
+            <FormField
+              control={form.control}
+              name="provider"
+              render={({ field }) => (
+                <FormItem className="from-item">
+                  <FormLabel className="col-span-1">
+                    {t("setting.provider") || "Provider"}
+                  </FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={(value) => {
+                      field.onChange(value);
+                      // Update the store immediately when provider changes
+                      const { update } = useSettingStore.getState();
+                      update({
+                        provider: value as string,
+                        // Also update the models based on the new provider
+                        thinkingModel: form.getValues("thinkingModel"),
+                        networkingModel: form.getValues("networkingModel"),
+                      });
+                      // Refresh model list immediately when provider changes
+                      fetchModelList();
+                    }}>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="google">Google Gemini</SelectItem>
+                        <SelectItem value="openai">OpenAI</SelectItem>
+                        <SelectItem value="anthropic">Anthropic Claude</SelectItem>
+                        <SelectItem value="kimi">Moonshot Kimi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
             <FormField
               control={form.control}
               name="thinkingModel"
